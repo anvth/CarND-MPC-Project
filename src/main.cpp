@@ -128,8 +128,25 @@ int main() {
           const double Lf = 2.67;
 
           // Insert all the predicted state values into a vector
+          // Eigen::VectorXd state(6);
+          // state << 0, 0, 0, v, cte, epsi;
+          // Latency for predicting time at actuation
+          const double latency = 0.1;
+
+          // Predict state after latency of 100ms
+          // x, y and psi are all zero after transformation to vehicle's orientation
+          // psi is zero, cos(0) = 1
+          double pred_px = 0.0 + v * latency;
+          // sin(0) = 0, y stays as 0 (y + v * 0 * dt)
+          const double pred_py = 0.0;
+          double pred_psi = 0.0 + v * -delta / Lf * latency;
+          double pred_v = v + a * latency;
+          double pred_cte = cte + v * sin(epsi) * latency;
+          double pred_epsi = epsi + v * -delta / Lf * latency;
+
+          // Feed in the predicted state values
           Eigen::VectorXd state(6);
-          state << 0, 0, 0, v, cte, epsi;
+          state << pred_px, pred_py, pred_psi, pred_v, pred_cte, pred_epsi;
 
           // Solve for new actuations (and to show predicted x and y in the future)
           auto vars = mpc.Solve(state, coeffs);

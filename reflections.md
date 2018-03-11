@@ -39,7 +39,7 @@ The polyfit() function is next invoked to fit the transformed waypoints. This es
 
 With the planned path in vehicle space, the MPC solver is is fed with the state vector, which also includes x/y position and the orientation of the vehicle.
 
-The solve() function in the MPC class has variables based off the state size, actuators and timestamps. All these variables are initially set to zero except the first variable, which is set to the input current state(lines ***-***). Next, I set upper and lower limits for the variables. All variables are set to an upper limit of max negative and lower limit max positive. These limits for delta and "a" are based on the simulated vehicle having max steering angles and maximum throttle or breaking of these values. The delta values are limited between -25 to 25(lines ***-***) and the value "a" is limited between -1 to +1(lines ***-***). Similarly, Constraints are also set. Initially to zeros and constrain their lower and upper limits to input state.
+The solve() function in the MPC class has variables based off the state size, actuators and timestamps. All these variables are initially set to zero except the first variable, which is set to the input current state(lines 167-170). Next, I set upper and lower limits for the variables. All variables are set to an upper limit of max negative and lower limit max positive. These limits for delta and "a" are based on the simulated vehicle having max steering angles and maximum throttle or breaking of these values. The delta values are limited between -25 to 25(lines 174-177) and the value "a" is limited between -1 to +1(lines 186-189). Similarly, Constraints are also set. Initially to zeros and constrain their lower and upper limits to input state.
 
 
 # Model Predictive Control with Latency
@@ -51,3 +51,5 @@ This lead to the following effects:
 - Any existing oscillation would get amplified.
 
 In order to overcome above effects, I set the timestamp length and elapsed duration to a relatively high value. Also, I increased the penalty on the use of actuators.
+
+Apart from these, I also added an additional step to predict the location of the vehicle after 100ms or 0.1 seconds. I have used the same update equations as those in MPC model, except I have set the "dt" to be equal to the latency value. These predicted values are then fed into the true model. Since, the value of x, y and psi are expected to be zero right after the coordinate transformation, the update statements are relatively simple(lines 134-145 - main.cpp).
